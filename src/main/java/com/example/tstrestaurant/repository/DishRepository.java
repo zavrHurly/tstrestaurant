@@ -1,5 +1,6 @@
 package com.example.tstrestaurant.repository;
 
+import com.example.tstrestaurant.error.DataConflictException;
 import com.example.tstrestaurant.models.Dish;
 import com.example.tstrestaurant.models.Restaurant;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,10 +15,10 @@ import java.util.Optional;
 public interface DishRepository extends BaseRepository<Dish> {
 
     @Query("SELECT d FROM Dish d WHERE d.restaurant.id=:restaurantId")
-    List<Dish> getAll();
+    List<Dish> getAll(Long restaurantId);
 
     @Query("SELECT d FROM Dish d WHERE d.id = :id and d.restaurant.id = :restaurantId")
-    Dish get(Long id);
+    Optional <Dish> get(Long id, Long restaurantId);
 
     @Query(value = "SELECT d FROM Dish d WHERE d.id=:id")
     public Optional<Dish> getDish(Long id);
@@ -26,4 +27,9 @@ public interface DishRepository extends BaseRepository<Dish> {
     @Transactional
     @Query("DELETE FROM Dish d WHERE d.id=:id AND d.restaurant.id=:restaurantId")
     int delete(Long id, Long restaurantId);
+
+    default Dish checkBelong(Long id, Long restaurantId) {
+        return get(id, restaurantId).orElseThrow(
+                () -> new DataConflictException("Dish id=" + id + " doesn't belong to Restaurant id=" + restaurantId));
+    }
 }

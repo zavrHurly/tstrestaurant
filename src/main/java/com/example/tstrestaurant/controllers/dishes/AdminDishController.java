@@ -2,6 +2,7 @@ package com.example.tstrestaurant.controllers.dishes;
 
 import com.example.tstrestaurant.models.Dish;
 import com.example.tstrestaurant.repository.DishRepository;
+import com.example.tstrestaurant.services.DishService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -14,6 +15,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+import static com.example.tstrestaurant.utils.ValidationUtil.assureIdConsistent;
 import static com.example.tstrestaurant.utils.ValidationUtil.checkNew;
 
 @RestController
@@ -21,14 +23,16 @@ import static com.example.tstrestaurant.utils.ValidationUtil.checkNew;
 @Slf4j
 @AllArgsConstructor
 public class AdminDishController {
-    static final String REST_URL = "rest/admin/dish";
+    static final String REST_URL = "rest/admin/restaurant/{restaurantId}/dish";
 
     private final DishRepository dishRepository;
 
+    private final DishService dishService;
+
 
     @GetMapping("/{id}")
-    public ResponseEntity<Dish> get(@PathVariable Long id) {
-        log.info("get restaurant {}", id);
+    public ResponseEntity<Dish> get(@PathVariable Long restaurantId, @PathVariable Long id) {
+        log.info("get dish {} from restaurant {}", id, restaurantId);
         return ResponseEntity.of(dishRepository.getDish(id));
     }
 
@@ -40,25 +44,26 @@ public class AdminDishController {
     }
 
     @GetMapping
-    public List<Dish> getAll() {
+    public List<Dish> getAll(@PathVariable Long restaurantId) {
         log.info("getAll");
-        return dishRepository.getAll();
+        return dishRepository.getAll(restaurantId);
     }
 
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@RequestBody Dish dish, @PathVariable ("id") Dish dishFromDb) {
-        log.info("update {}", dish);
-        BeanUtils.copyProperties(dish, dishFromDb, "id");
-        dishRepository.save(dish);
+    public void update(@RequestBody Dish dish, @PathVariable Long id, Long restaurantId) {
+        log.info("update {} for restaurant {}", dish, restaurantId);
+        assureIdConsistent(dish, id);
+        dishRepository.checkBelong(id, restaurantId);
+        dishService.create(dish, restaurantId);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Dish> createWithLocation(@RequestBody Dish dish) {
-        log.info("create {} for restaurant", dish);
+    public ResponseEntity<Dish> createWithLocation(@RequestBody Dish dish, @PathVariable Long restaurantId) {
+        log.info("create {} for restaurant {}", dish, restaurantId);
         checkNew(dish);
-        Dish created = dishRepository.save(dish);
+        Dish created = dishService.create(dish, restaurantId);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/{id}")
                 .buildAndExpand(created.getId()).toUri();

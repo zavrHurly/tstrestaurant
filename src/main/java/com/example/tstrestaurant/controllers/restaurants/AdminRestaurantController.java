@@ -30,12 +30,9 @@ public class AdminRestaurantController{
 
     private final RestaurantRepository restaurantRepository;
 
-    private final DishRepository dishRepository;
-
     @Autowired
     public AdminRestaurantController(RestaurantRepository restaurantRepository, DishRepository dishRepository) {
         this.restaurantRepository = restaurantRepository;
-        this.dishRepository = dishRepository;
     }
 
     @GetMapping("/{id}")
@@ -59,11 +56,10 @@ public class AdminRestaurantController{
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Restaurant> createWithLocation(@RequestBody Restaurant restaurant, List<Dish> menu) {
+    public ResponseEntity<Restaurant> createWithLocation(@RequestBody Restaurant restaurant) {
         log.info("create {}", restaurant);
         checkNew(restaurant);
         Restaurant created = restaurantRepository.save(restaurant);
-        dishRepository.saveAll(menu);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/{id}")
                 .buildAndExpand(created.getId()).toUri();

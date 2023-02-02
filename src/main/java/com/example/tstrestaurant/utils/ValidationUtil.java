@@ -13,6 +13,14 @@ public class ValidationUtil {
         }
     }
 
+    public static void assureIdConsistent(HasId bean, Long id) {
+        if (bean.isNew()) {
+            bean.setId(id);
+        } else if (bean.id() != id) {
+            throw new IllegalRequestDataException(bean.getClass().getSimpleName() + " must has id=" + id);
+        }
+    }
+
     public static <T> T checkExisted(T obj, Long id) {
         if (obj == null) {
             throw new IllegalRequestDataException("Entity with id=" + id + " not found");
