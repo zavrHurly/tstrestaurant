@@ -1,6 +1,5 @@
 package com.example.tstrestaurant.models;
 
-import com.example.tstrestaurant.HasId;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,23 +13,20 @@ import org.springframework.data.util.ProxyUtils;
 @MappedSuperclass
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class BaseEntity implements Persistable<Long>, HasId {
+public class BaseEntity implements Persistable<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
-    @Override
     public Long getId() {
         return id;
     }
 
-    @Override
     public void setId(Long id) {
         this.id = id;
     }
 
-    @Override
     public boolean isNew() {
         return id == null;
     }
@@ -45,10 +41,5 @@ public class BaseEntity implements Persistable<Long>, HasId {
         }
         BaseEntity that = (BaseEntity) o;
         return id != null && id.equals(that.id);
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + ":" + id;
     }
 }

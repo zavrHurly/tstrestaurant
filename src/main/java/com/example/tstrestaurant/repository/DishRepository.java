@@ -27,9 +27,4 @@ public interface DishRepository extends BaseRepository<Dish> {
     @Transactional
     @Query("DELETE FROM Dish d WHERE d.id=:id AND d.restaurant.id=:restaurantId")
     int delete(Long id, Long restaurantId);
-
-    default Dish checkBelong(Long id, Long restaurantId) {
-        return get(id, restaurantId).orElseThrow(
-                () -> new DataConflictException("Dish id=" + id + " doesn't belong to Restaurant id=" + restaurantId));
-    }
 }

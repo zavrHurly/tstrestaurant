@@ -4,6 +4,7 @@ import com.example.tstrestaurant.models.Dish;
 import com.example.tstrestaurant.models.Restaurant;
 import com.example.tstrestaurant.repository.DishRepository;
 import com.example.tstrestaurant.repository.RestaurantRepository;
+import com.example.tstrestaurant.services.RestaurantService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -18,21 +19,23 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.example.tstrestaurant.utils.ValidationUtil.checkNew;
 
 @RestController
 @RequestMapping(value = AdminRestaurantController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class AdminRestaurantController{
 
-    static final String REST_URL = "rest/admin/restaurant";
+    public static final String REST_URL = "api/admin/restaurant";
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final RestaurantRepository restaurantRepository;
 
+    private final RestaurantService restaurantService;
+
     @Autowired
-    public AdminRestaurantController(RestaurantRepository restaurantRepository, DishRepository dishRepository) {
+    public AdminRestaurantController(RestaurantRepository restaurantRepository, RestaurantService restaurantService) {
         this.restaurantRepository = restaurantRepository;
+        this.restaurantService = restaurantService;
     }
 
     @GetMapping("/{id}")
@@ -43,22 +46,14 @@ public class AdminRestaurantController{
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable ("id") Restaurant restaurant){
-        log.info("delete restaurant {}", restaurant.getId());
-        restaurantRepository.delete(restaurant);
-    }
-
-    @GetMapping
-    public List<Restaurant> getAll() {
-        log.info("getAll");
-        LocalDate today = LocalDate.now();
-        return restaurantRepository.getAll(today);
+    public void delete(@PathVariable Long id){
+        log.info("delete restaurant {}", id);
+        restaurantRepository.delete(id);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Restaurant> createWithLocation(@RequestBody Restaurant restaurant) {
         log.info("create {}", restaurant);
-        checkNew(restaurant);
         Restaurant created = restaurantRepository.save(restaurant);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/{id}")
@@ -68,9 +63,8 @@ public class AdminRestaurantController{
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@RequestBody Restaurant restaurant, @PathVariable ("id") Restaurant restaurantFromDb) {
+    public void update(@RequestBody Restaurant restaurant, @PathVariable Long id) {
         log.info("update {}", restaurant);
-        BeanUtils.copyProperties(restaurant, restaurantFromDb, "id");
-        restaurantRepository.save(restaurant);
+        restaurantService.update(restaurant, id);
     }
 }

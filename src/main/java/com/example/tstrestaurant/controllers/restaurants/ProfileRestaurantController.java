@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 public class ProfileRestaurantController {
 
-    static final String REST_URL = "rest/profile/restaurant";
+    public static final String REST_URL = "api/profile/restaurant";
 
     private final RestaurantRepository restaurantRepository;
 

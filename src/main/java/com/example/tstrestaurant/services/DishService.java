@@ -4,23 +4,25 @@ import com.example.tstrestaurant.models.Dish;
 import com.example.tstrestaurant.repository.DishRepository;
 import com.example.tstrestaurant.repository.RestaurantRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
 public class DishService {
 
     private final DishRepository dishRepository;
 
-    private final RestaurantRepository restaurantRepository;
 
+    @Autowired
+    public DishService(DishRepository dishRepository) {
+        this.dishRepository = dishRepository;
+    }
 
     @Transactional
-    public Dish create(Dish dish, Long restaurantId) {
-        dish.setRestaurant(restaurantRepository.getExisted(restaurantId));
+    public Dish create(Dish dish) {
         return dishRepository.save(dish);
     }
 }

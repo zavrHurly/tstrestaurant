@@ -11,7 +11,7 @@ import static com.example.tstrestaurant.utils.ValidationUtil.checkExisted;
 import static com.example.tstrestaurant.utils.ValidationUtil.checkModification;
 
 @NoRepositoryBean
-public interface BaseRepository<T> extends CrudRepository<T, Integer> {
+public interface BaseRepository<T> extends JpaRepository<T, Long> {
 
     @Transactional
     @Modifying
