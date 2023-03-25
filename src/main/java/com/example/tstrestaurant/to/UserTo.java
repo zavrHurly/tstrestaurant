@@ -31,6 +31,12 @@ public class UserTo extends BaseTo {
         this.password = password;
     }
 
+    public UserTo(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+
     @Override
     public String toString() {
         return "UserTo:" + id + '[' + email + ']';

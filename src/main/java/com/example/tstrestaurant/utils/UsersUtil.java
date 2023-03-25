@@ -10,8 +10,8 @@ import static com.example.tstrestaurant.config.SecurityConfig.PASSWORD_ENCODER;
 @UtilityClass
 public class UsersUtil {
 
-    public static User createNewFromTo(UserTo userTo) {
-        return new User(null, userTo.getName(), userTo.getEmail().toLowerCase(), userTo.getPassword(), Role.USER);
+    public static User createNewUser(User user) {
+        return new User(null, user.getName(), user.getEmail().toLowerCase(), user.getPassword(), Role.ADMIN);
     }
 
     public static User updateFromTo(User user, UserTo userTo) {

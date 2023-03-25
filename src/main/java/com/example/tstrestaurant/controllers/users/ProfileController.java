@@ -45,15 +45,6 @@ public class ProfileController {
         userRepository.deleteExisted(authUser.id());
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<User> register(@Valid @RequestBody UserTo userTo) {
-        log.info("register {}", userTo);
-        User created = userRepository.save(UsersUtil.prepareToSave(UsersUtil.createNewFromTo(userTo)));
-        URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(REST_URL).build().toUri();
-        return ResponseEntity.created(uriOfNewResource).body(created);
-    }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
